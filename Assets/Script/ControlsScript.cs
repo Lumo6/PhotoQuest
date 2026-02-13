@@ -7,6 +7,7 @@ public class ControlsScript : MonoBehaviour
     [Header("Input")]
     [SerializeField] private InputActionReference MoveActionRef;
     [SerializeField] private InputActionReference LookActionRef;
+    [SerializeField] private InputActionReference PhotoActionRef;
 
     [Header("Movement")]
     [SerializeField] private float speed = 6f;
@@ -28,12 +29,18 @@ public class ControlsScript : MonoBehaviour
     {
         MoveActionRef.action.Enable();
         LookActionRef.action.Enable();
+        PhotoActionRef.action.Enable();
+
+        PhotoActionRef.action.performed += takePhoto;
     }
 
     void OnDisable()
     {
+        PhotoActionRef.action.performed -= takePhoto;
+
         MoveActionRef.action.Disable();
         LookActionRef.action.Disable();
+        PhotoActionRef.action.Disable();
     }
 
     void Start()
@@ -48,6 +55,19 @@ public class ControlsScript : MonoBehaviour
     {
         Move();
         Look();
+    }
+
+    void takePhoto(InputAction.CallbackContext ctx)
+    {
+        PhotoCapture photoComp = GetComponent<PhotoCapture>();
+        if (!photoComp.viewingPhoto)
+        {
+            StartCoroutine(photoComp.CapturePhoto());
+        }
+        else
+        {
+            photoComp.RemovePhoto();
+        }
     }
 
     void Move()
