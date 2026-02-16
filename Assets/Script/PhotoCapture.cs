@@ -36,7 +36,7 @@ public class PhotoCapture : MonoBehaviour
 
         SavePhoto();
 
-        SoundFXManager.Instance.PlaySound(photoSoundEffect, transform);
+        //SoundFXManager.Instance.PlaySound(photoSoundEffect, transform);
         ShowPhoto();
         StartCoroutine(FlashEffect());
     }
