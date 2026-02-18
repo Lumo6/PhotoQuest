@@ -719,7 +719,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -1158,17 +1158,21 @@ PrefabInstance:
       propertyPath: PhotoActionRef
       value: 
       objectReference: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    - target: {fileID: 8109276285807444131, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
+      propertyPath: near clip plane
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1176,7 +1180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8506005769219681395, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1219,7 +1223,8 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 849071506290958016, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2072724855797533349, guid: 998f74df9213dbd4482ab1c5b22340c1, type: 3}
       insertIndex: -1
