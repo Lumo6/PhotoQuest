@@ -15,8 +15,6 @@ MonoBehaviour:
   questTitle: TEST
   description: CECI EST UN TEST
   requiredTags:
-  - PersAgee
-  - Stand
+  - building
   timeRequirement: 0
   goodVibesPoints: 10
-  nextQuest: {fileID: 0}
