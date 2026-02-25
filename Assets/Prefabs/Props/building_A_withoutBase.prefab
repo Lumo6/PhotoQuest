@@ -104,3 +104,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TagScript
   tags:
   - building
+  - shop
+  - green
+  - dark blue
