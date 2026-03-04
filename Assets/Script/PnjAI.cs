@@ -1,24 +1,36 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class PnjAI : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private NavMeshAgent agent;// Reference to the NavMeshAgent component
-    [SerializeField] private GameObject player;// Reference to the player GameObject
+    [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private GameObject player;
 
     [Header("Patrol")]
-    public Vector3[] patrolPoints;// Points to move between
-    private int currentIndex = 0;// Current index in the patrol points array
+    public List<GameObject> patrolPoints;
+    private int currentIndex = 0;
 
-
-    private float stopTimer = 0f;// Time at which the pnj stoped
-
+    private float stopTimer = 300f;
+    private bool waiting = false;
 
     void Awake()
     {
-        // Initialize references and settings
         agent = GetComponent<NavMeshAgent>();
+    }
+
+    void Start()
+    {
+        if (patrolPoints.Count > 0)
+        {
+            agent.SetDestination(patrolPoints[currentIndex].transform.position);
+        }
+        else
+        {
+            Debug.LogWarning("No patrol points assigned to " + gameObject.name);
+        }
     }
 
     void Update()
@@ -26,32 +38,68 @@ public class PnjAI : MonoBehaviour
         HandleMovement();
     }
 
-
-    /// <summary>
-    /// Handle the movement of the professor based on player visibility.
-    /// </summary>
-    /// <param name="seesPlayer"></param>// True if the player is seen, false otherwise.
     void HandleMovement()
     {
+        if (patrolPoints.Count == 0)
+            return;
 
+        // Check if the agent reached the destination
+        if (!waiting && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        {
+            waiting = true;
+            stopTimer = GameManager.Instance.getTime();
+            agent.isStopped = true;
+        }
+
+        // Wait for 30 seconds
+        if (waiting)
+        {
+            if (GameManager.Instance.getTime() - stopTimer >= 5f)
+            {
+                GoToNextPoint();
+            }
+        }
     }
 
-    /// <summary>
-    /// Rotate the professor to face the player.
-    /// </summary>
+    void GoToNextPoint()
+    {
+        waiting = false;
+        agent.isStopped = false;
+
+        currentIndex++;
+        if (currentIndex >= patrolPoints.Count)
+        {
+            GameManager.Instance.removeNpc(gameObject);
+            return;
+        }
+
+        agent.SetDestination(patrolPoints[currentIndex].transform.position);
+    }
+
     void RotateTowardsPlayer()
     {
         if (player == null)
             return;
-        // Calculate direction to player
+
         Vector3 direction = player.transform.position - transform.position;
         direction.y = 0f;
-        // Rotate smoothly towards the player
+
         Quaternion targetRotation = Quaternion.LookRotation(direction);
+
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             targetRotation,
             1.0f * Time.deltaTime
         );
+    }
+
+    public void SetActivity(List<GameObject> activityPoints)
+    {
+        patrolPoints = activityPoints;
+        currentIndex = 0;
+        if (patrolPoints.Count > 0)
+        {
+            agent.SetDestination(patrolPoints[currentIndex].transform.position);
+        }
     }
 }

@@ -25,4 +25,6 @@ public class PhotoQuestObject : ScriptableObject
 
     [Header("Rewards")]
     public int goodVibesPoints;
+
+    public bool completed = false;
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// 
@@ -12,6 +13,10 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// Initialise le Singleton.
     /// </summary>
+    
+    [SerializeField] private GameObject scrollView;
+
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -22,4 +27,8 @@ public class UIManager : MonoBehaviour
         Instance = this;
     }
 
+    public void ActualiazeView()
+    {
+
+    }
 }
