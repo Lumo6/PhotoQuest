@@ -10,13 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6313d2e45aad175429e3297ae90c7596, type: 3}
-  m_Name: TEST
+  m_Name: Quest2
   m_EditorClassIdentifier: Assembly-CSharp::PhotoQuestObject
-  questTitle: TEST
-  description: CECI EST UN TEST
+  questTitle: Finally the concert day
+  description: Take a picture of the park with at least a man and a woman in it that
+    are chilling
   requiredTags:
-  - building
+  - tree
   - woman
-  timeRequirement: 0
+  - man
+  timeRequirement: 4
+  requiredAnimations:
+  - chill
   goodVibesPoints: 10
   completed: 0

@@ -50,7 +50,9 @@ public class PhotoCapture : MonoBehaviour
     public IEnumerator CapturePhoto()
     {
         yield return new WaitForEndOfFrame();
-        
+
+        UIManager.Instance.DeactivateGameUI();
+
         Rect regionToRead = new Rect(0, 0, Screen.width, Screen.height);
 
         screenCapture.ReadPixels(regionToRead, 0, 0, false);
@@ -59,17 +61,18 @@ public class PhotoCapture : MonoBehaviour
         SavePhoto();
 
         float photoQuality = 0f;
-        bool success = ValidatePhoto(out photoQuality);
+        List<PhotoQuestObject> success = ValidatePhoto(out photoQuality);
 
-        if (success)
+        foreach (PhotoQuestObject quest in success)
         {
-            GameManager.Instance.AddGoodVibes(gm.currentQuest.goodVibesPoints * photoQuality);
-            gm.nextQuest();
+            quest.completed = true;
+            UIManager.Instance.ShowQuestCompletedIcon(quest);
         }
 
+        UIManager.Instance.ActualiazeView(gm.quests);
 
-        //SoundFXManager.Instance.PlaySound(photoSoundEffect, transform);
         ShowPhoto();
+        UIManager.Instance.ActivateGameUI();
         StartCoroutine(FlashEffect());
     }
 
@@ -114,51 +117,61 @@ public class PhotoCapture : MonoBehaviour
         photoFrame.SetActive(false);
     }
 
-    bool ValidatePhoto(out float averageScore)
+    List<PhotoQuestObject> ValidatePhoto(out float averageScore)
     {
         averageScore = 0f;
 
-        if (gm.currentQuest == null)
-            return false;
-
         List<DetectedPhotoObject> objects = DetectTags();
+        List<PhotoQuestObject> completedQuests = new List<PhotoQuestObject>();
 
         float totalScore = 0f;
         int validTagCount = 0;
 
-        foreach (string requiredTag in gm.currentQuest.requiredTags)
+        foreach (PhotoQuestObject quest in gm.quests)
         {
-            float bestScoreForTag = -1f;
+            bool questValid = true;
 
-            foreach (DetectedPhotoObject obj in objects)
+            // Vérification du moment de la journée pour cette quête
+            if (!IsTimeMatching(quest.timeRequirement))
+                questValid = false;
+
+            if (!questValid)
+                continue;
+
+            foreach (string requiredTag in quest.requiredTags)
             {
-                if (obj.tags.Contains(requiredTag))
+                float bestScoreForTag = -1f;
+
+                foreach (DetectedPhotoObject obj in objects)
                 {
-                    if (obj.score > bestScoreForTag)
-                        bestScoreForTag = obj.score;
+                    if (obj.tags.Contains(requiredTag))
+                    {
+                        if (obj.score > bestScoreForTag)
+                            bestScoreForTag = obj.score;
+                    }
                 }
+
+                if (bestScoreForTag < 0f)
+                {
+                    questValid = false;
+                    break;
+                }
+
+                totalScore += bestScoreForTag;
+                validTagCount++;
             }
 
-            if (bestScoreForTag < 0f)
+            if (questValid)
             {
-                Debug.Log("Missing required tag: " + requiredTag);
-                return false; 
+                completedQuests.Add(quest);
             }
-
-            totalScore += bestScoreForTag;
-            validTagCount++;
         }
 
-        // Vérification du moment de la journée
-        if (!IsTimeMatching(gm.CurrentTimeOfDay))
-            return false;
+        if (validTagCount > 0)
+            averageScore = totalScore / validTagCount;
 
-        averageScore = totalScore / validTagCount;
-
-        return true;
+        return completedQuests;
     }
-
-
 
     List<DetectedPhotoObject> DetectTags()
     {
@@ -230,24 +243,29 @@ public class PhotoCapture : MonoBehaviour
         return false;
     }
 
-    bool IsTimeMatching(GameManager.TimeOfDay currentTime)
+    bool IsTimeMatching(PhotoQuestObject.TimeRequirement requirement)
     {
-        switch (gm.currentQuest.timeRequirement)
+        GameManager.TimeOfDay current = gm.CurrentTimeOfDay;
+
+        switch (requirement)
         {
+            case PhotoQuestObject.TimeRequirement.None:
+                return true;
+
             case PhotoQuestObject.TimeRequirement.Day:
-                return currentTime == GameManager.TimeOfDay.Day;
+                return current == GameManager.TimeOfDay.Day;
 
             case PhotoQuestObject.TimeRequirement.Sunset:
-                return currentTime == GameManager.TimeOfDay.Sunset;
+                return current == GameManager.TimeOfDay.Sunset;
 
             case PhotoQuestObject.TimeRequirement.Night:
-                return currentTime == GameManager.TimeOfDay.Night;
+                return current == GameManager.TimeOfDay.Night;
 
             case PhotoQuestObject.TimeRequirement.Concert:
-                return currentTime == GameManager.TimeOfDay.Concert;
+                return current == GameManager.TimeOfDay.Concert;
 
             default:
-                return true;
+                return false;
         }
     }
 }

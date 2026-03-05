@@ -25,8 +25,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int day = 0;
 
     [Header("Quest")]
+    [SerializeField] private List<PhotoQuestObject> questsSO;
     public List<PhotoQuestObject> quests;
-    public PhotoQuestObject currentQuest;
 
     [Header("Good Vibes System")]
     [SerializeField] private float goodVibesPoints = 0f;
@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float daySunIntensity = 1.2f;
     [SerializeField] private float nightSunIntensity = 0f;
+
     
 
 
@@ -61,8 +62,8 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
 
-        //Randomize the order of quests at the start of the game
-        if (quests.Count > 0)
+        //Randomize which quests will be active for this playthrough
+        if (questsSO.Count > 0)
         {
             int n = quests.Count;
             while (n >= 1)
@@ -73,19 +74,22 @@ public class GameManager : MonoBehaviour
                 quests[n-1] = value;
                 n--;
             }
-            //assign the first quest
-            currentQuest = quests[0];
         }
             
         else
             Debug.Log("Remember to assign quests in the GameManager!");
 
-        //UIManager.Instance.ActualiazeView();
+        
 
         for (int i = 0; i < poispawn.Count; i++)
         {
             spawnNpc();
         }
+    }
+
+    private void Start()
+    {
+        UIManager.Instance.ActualiazeView(quests);
     }
 
     private void Update()
@@ -100,6 +104,7 @@ public class GameManager : MonoBehaviour
         {
             currentTime = 0f;
             day += 1;
+            UIManager.Instance.UpdateDayNumber(day);
         }
 
 
@@ -163,18 +168,7 @@ public class GameManager : MonoBehaviour
     public void AddGoodVibes(float points)
     {
         goodVibesPoints += points * goodVibesMultiplier;
-    }
-
-    public void nextQuest()
-    {
-        int currentIndex = quests.IndexOf(currentQuest); // retourne l'index de l'élément dans le tableau, sinon retourne -1
-        if (currentIndex != -1)
-            if (currentIndex != quests.Count - 1)
-                currentQuest = quests[currentIndex + 1];
-            else
-                end();
-        else
-            Debug.Log("All quests completed!");
+        UIManager.Instance.UpdateVibeScore(Mathf.CeilToInt(goodVibesPoints));
     }
 
     public float getTime()
@@ -182,10 +176,12 @@ public class GameManager : MonoBehaviour
         return currentTime;
     }
 
-    private void end()
+    void end()
     {
-        Debug.Log("Congratulations! You've completed all the quests and won the game!");
-        
+        Time.timeScale = 0f;
 
+        string msg = "";
+
+        UIManager.Instance.ShowEndGameUI(msg);
     }
 }

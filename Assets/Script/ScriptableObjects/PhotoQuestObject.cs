@@ -22,6 +22,7 @@ public class PhotoQuestObject : ScriptableObject
     [Header("Validation Criteria")]
     public List<string> requiredTags;
     public TimeRequirement timeRequirement;
+    public List<string> requiredAnimations;
 
     [Header("Rewards")]
     public int goodVibesPoints;

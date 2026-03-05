@@ -8,6 +8,7 @@ public class ControlsScript : MonoBehaviour
     [SerializeField] private InputActionReference MoveActionRef;
     [SerializeField] private InputActionReference LookActionRef;
     [SerializeField] private InputActionReference PhotoActionRef;
+    [SerializeField] private InputActionReference FreeCursorRef;
 
     [Header("Movement")]
     [SerializeField] private float speed = 6f;
@@ -30,17 +31,21 @@ public class ControlsScript : MonoBehaviour
         MoveActionRef.action.Enable();
         LookActionRef.action.Enable();
         PhotoActionRef.action.Enable();
+        FreeCursorRef.action.Enable();
 
         PhotoActionRef.action.performed += takePhoto;
+        FreeCursorRef.action.performed += freecursor;
     }
 
     void OnDisable()
     {
         PhotoActionRef.action.performed -= takePhoto;
+        FreeCursorRef.action.performed -= freecursor;
 
         MoveActionRef.action.Disable();
         LookActionRef.action.Disable();
         PhotoActionRef.action.Disable();
+        FreeCursorRef.action.Disable();
     }
 
     void Start()
@@ -57,8 +62,27 @@ public class ControlsScript : MonoBehaviour
         Look();
     }
 
+    void freecursor(InputAction.CallbackContext ctx)
+    {
+        if(Cursor.lockState == CursorLockMode.Locked)
+        {
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
     void takePhoto(InputAction.CallbackContext ctx)
     {
+        if (Cursor.lockState == CursorLockMode.None)
+            return;
+
         PhotoCapture photoComp = GetComponent<PhotoCapture>();
         if (!photoComp.viewingPhoto)
         {
@@ -72,6 +96,9 @@ public class ControlsScript : MonoBehaviour
 
     void Move()
     {
+        if (Cursor.lockState == CursorLockMode.None)
+            return;
+
         Vector2 input = MoveActionRef.action.ReadValue<Vector2>();
 
         Vector3 move = transform.right * input.x + transform.forward * input.y;
@@ -86,6 +113,9 @@ public class ControlsScript : MonoBehaviour
 
     void Look()
     {
+        if (Cursor.lockState == CursorLockMode.None)
+            return;
+
         Vector2 targetLook = LookActionRef.action.ReadValue<Vector2>() * mouseSensitivity;
 
         currentLook = Vector2.SmoothDamp(
