@@ -90,6 +90,9 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (day >= 7)
+            end();
+
         currentTime += Time.deltaTime;
         Debug.Log("Current Time: " + currentTime);
 
@@ -166,7 +169,10 @@ public class GameManager : MonoBehaviour
     {
         int currentIndex = quests.IndexOf(currentQuest); // retourne l'index de l'élément dans le tableau, sinon retourne -1
         if (currentIndex != -1)
-            currentQuest = quests[currentIndex + 1];
+            if (currentIndex != quests.Count - 1)
+                currentQuest = quests[currentIndex + 1];
+            else
+                end();
         else
             Debug.Log("All quests completed!");
     }
@@ -174,5 +180,12 @@ public class GameManager : MonoBehaviour
     public float getTime()
     {
         return currentTime;
+    }
+
+    private void end()
+    {
+        Debug.Log("Congratulations! You've completed all the quests and won the game!");
+        
+
     }
 }
