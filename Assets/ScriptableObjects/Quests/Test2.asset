@@ -17,6 +17,7 @@ MonoBehaviour:
   requiredTags:
   - tree
   - statue
-  timeRequirement: 0
-  goodVibesPoints: 0
+  timeRequirement: 1
+  requiredAnimations: []
+  goodVibesPoints: 10
   completed: 0

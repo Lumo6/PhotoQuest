@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [Header("Quest")]
     [SerializeField] private List<PhotoQuestObject> questsSO;
     public List<PhotoQuestObject> quests;
+    [SerializeField] private int nb_quest;
 
     [Header("Good Vibes System")]
     [SerializeField] private float goodVibesPoints = 0f;
@@ -44,6 +45,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float daySunIntensity = 1.2f;
     [SerializeField] private float nightSunIntensity = 0f;
+
+    [SerializeField] private ParticleSystem FestivalParticle;
 
     
 
@@ -65,14 +68,12 @@ public class GameManager : MonoBehaviour
         //Randomize which quests will be active for this playthrough
         if (questsSO.Count > 0)
         {
-            int n = quests.Count;
-            while (n >= 1)
+            int n = questsSO.Count;
+            for (int i = 0; i < nb_quest && i < n; i++)
             {
-                int k = Random.Range(0, n);
-                PhotoQuestObject value = quests[k];
-                quests[k] = quests[n-1];
-                quests[n-1] = value;
-                n--;
+                int index = Random.Range(0, n-i);
+                quests.Add(questsSO[index]);
+                questsSO.RemoveAt(index);
             }
         }
             
@@ -90,6 +91,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         UIManager.Instance.ActualiazeView(quests);
+        var main = FestivalParticle.main;
+        main.duration = totalDayDuration;
     }
 
     private void Update()
@@ -155,14 +158,37 @@ public class GameManager : MonoBehaviour
 
     private void UpdateTimeOfDay()
     {
+        TimeOfDay previousTime = CurrentTimeOfDay;
+
         if (day % 7 == 6) // Concert every sunday
+        {
             CurrentTimeOfDay = TimeOfDay.Concert;
+        }
         else if (currentTime < sunsetStart)
+        {
             CurrentTimeOfDay = TimeOfDay.Day;
+        }
         else if (currentTime < nightStart)
+        {
             CurrentTimeOfDay = TimeOfDay.Sunset;
+        }
         else
+        {
             CurrentTimeOfDay = TimeOfDay.Night;
+        }
+
+        // Gestion des particules uniquement si l'état change
+        if (CurrentTimeOfDay != previousTime)
+        {
+            if (CurrentTimeOfDay == TimeOfDay.Concert)
+            {
+                FestivalParticle.Play();
+            }
+            else
+            {
+                FestivalParticle.Stop();
+            }
+        }
     }
 
     public void AddGoodVibes(float points)

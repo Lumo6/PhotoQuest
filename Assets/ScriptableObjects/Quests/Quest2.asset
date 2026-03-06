@@ -22,5 +22,5 @@ MonoBehaviour:
   timeRequirement: 4
   requiredAnimations:
   - chill
-  goodVibesPoints: 10
+  goodVibesPoints: 50
   completed: 0

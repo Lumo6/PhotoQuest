@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6313d2e45aad175429e3297ae90c7596, type: 3}
   m_Name: test3
   m_EditorClassIdentifier: Assembly-CSharp::PhotoQuestObject
-  questTitle: a ze arze
-  description: z erz rz er
+  questTitle: Oh, Shiny !
+  description: Take a photo of a bald man close to a building with some trees behind
+    him.
   requiredTags:
   - man
   - bald
   - building
   - tree
-  timeRequirement: 0
-  goodVibesPoints: 0
+  timeRequirement: 3
+  requiredAnimations: []
+  goodVibesPoints: 35
   completed: 0
