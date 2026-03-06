@@ -8,6 +8,7 @@ public class PnjAI : MonoBehaviour
     [Header("References")]
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private GameObject player;
+    [SerializeField] private Animator animator;
 
     [Header("Patrol")]
     public List<GameObject> patrolPoints;
@@ -19,6 +20,8 @@ public class PnjAI : MonoBehaviour
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Start()
@@ -49,6 +52,8 @@ public class PnjAI : MonoBehaviour
             waiting = true;
             stopTimer = GameManager.Instance.getTime();
             agent.isStopped = true;
+            animator.SetBool("iswalking",false);
+            ActionAnimation(patrolPoints[currentIndex]);
         }
 
         // Wait for 30 seconds
@@ -56,8 +61,52 @@ public class PnjAI : MonoBehaviour
         {
             if (GameManager.Instance.getTime() - stopTimer >= 5f)
             {
+                animator.SetBool("iswalking", true);
+                CancelActionAnimation(patrolPoints[currentIndex]);
                 GoToNextPoint();
             }
+        }
+    }
+
+    void ActionAnimation(GameObject POI)
+    {
+        string animationName = POI.GetComponent<TagScript>().tags[0];
+
+        switch (animationName)
+        {
+            case "sitting":
+                animator.SetBool("issitting", true);
+                break;
+            case "praying":
+                animator.SetBool("ispraying", true);
+                break;
+            case "idle":
+                animator.SetBool("isidle", true);
+                break;
+            default:
+                Debug.LogWarning("Unknown animation tag: " + animationName);
+                break;
+        }
+    }
+
+    void CancelActionAnimation(GameObject POI)
+    {
+        string animationName = POI.GetComponent<TagScript>()?.tags[0];
+
+        switch (animationName)
+        {
+            case "sitting":
+                animator.SetBool("issitting", false);
+                break;
+            case "praying":
+                animator.SetBool("ispraying", false);
+                break;
+            case "idle":
+                animator.SetBool("isidle", false);
+                break;
+            default:
+                Debug.LogWarning("Unknown animation tag: " + animationName);
+                break;
         }
     }
 

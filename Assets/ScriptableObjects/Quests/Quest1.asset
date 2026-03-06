@@ -18,5 +18,6 @@ MonoBehaviour:
   - ferris wheel
   - woman
   timeRequirement: 2
-  goodVibesPoints: 25
+  requiredAnimations: []
+  goodVibesPoints: 50
   completed: 0

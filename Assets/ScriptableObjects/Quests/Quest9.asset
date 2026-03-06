@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6313d2e45aad175429e3297ae90c7596, type: 3}
+  m_Name: Quest9
+  m_EditorClassIdentifier: Assembly-CSharp::PhotoQuestObject
+  questTitle: Don't annoy him !
+  description: Take a photo of a sour man sitting on a bench
+  requiredTags:
+  - man
+  - sour
+  timeRequirement: 0
+  requiredAnimations:
+  - bench
+  goodVibesPoints: 45
+  completed: 0

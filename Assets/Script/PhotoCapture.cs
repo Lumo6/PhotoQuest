@@ -9,7 +9,6 @@ public class PhotoCapture : MonoBehaviour
     [Header("Photo Taker")]
     [SerializeField] private Image photoDisplayer;
     [SerializeField] private GameObject photoFrame;
-    [SerializeField] private AudioClip photoSoundEffect;
 
     [Header("Flash Effect")]
     [SerializeField] private GameObject cameraFlash;
@@ -20,12 +19,14 @@ public class PhotoCapture : MonoBehaviour
 
     [Header("Detection")]
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private float detectionDistance = 40f;
+    [SerializeField] private float detectionDistance = 80f;
     [SerializeField] private float sphereRadius = 5f;
-    [SerializeField] private float maxCenterAngle = 30f;
+    [SerializeField] private float maxCenterAngle = 150f;
     [SerializeField] private LayerMask detectionLayer;
     [SerializeField] private LayerMask obstructionLayer;
 
+    [Tooltip("Clip du son de photo")]
+    [SerializeField] private AudioClip photoMusicClip;
 
     private Texture2D screenCapture;
     public bool viewingPhoto = false;
@@ -67,6 +68,7 @@ public class PhotoCapture : MonoBehaviour
         {
             quest.completed = true;
             UIManager.Instance.ShowQuestCompletedIcon(quest);
+            GameManager.Instance.AddGoodVibes(quest.goodVibesPoints);
         }
 
         UIManager.Instance.ActualiazeView(gm.quests);
@@ -74,6 +76,7 @@ public class PhotoCapture : MonoBehaviour
         ShowPhoto();
         UIManager.Instance.ActivateGameUI();
         StartCoroutine(FlashEffect());
+        SoundFXManager.Instance.PlaySound(photoMusicClip, playerCamera.transform);
     }
 
     void SavePhoto()
@@ -135,7 +138,7 @@ public class PhotoCapture : MonoBehaviour
             if (!IsTimeMatching(quest.timeRequirement))
                 questValid = false;
 
-            if (!questValid)
+            if (!questValid || quest.completed)
                 continue;
 
             foreach (string requiredTag in quest.requiredTags)
@@ -164,6 +167,7 @@ public class PhotoCapture : MonoBehaviour
             if (questValid)
             {
                 completedQuests.Add(quest);
+                UIManager.Instance.ShowQuestCompletedIcon(quest);
             }
         }
 
@@ -193,7 +197,7 @@ public class PhotoCapture : MonoBehaviour
             if (tagScript == null)
                 continue;
 
-            Vector3 dir = target.position - playerCamera.transform.position;
+            Vector3 dir = hit.point - playerCamera.transform.position;
             float distance = dir.magnitude;
 
             if (distance > detectionDistance)
@@ -203,16 +207,9 @@ public class PhotoCapture : MonoBehaviour
             if (angle > maxCenterAngle)
                 continue;
 
-            if (IsObstructed(target))
-                continue;
-
-            // Calcul du score individuel
-            float score = 0f;
-
             float distanceScore = Mathf.InverseLerp(detectionDistance, 0, distance);
             float angleScore = Mathf.InverseLerp(maxCenterAngle, 0, angle);
-
-            score = (distanceScore * 0.5f + angleScore * 0.5f) * 100f;
+            float score = (distanceScore * 0.5f + angleScore * 0.5f) * 100f;
 
             DetectedPhotoObject obj = new DetectedPhotoObject
             {
@@ -222,25 +219,10 @@ public class PhotoCapture : MonoBehaviour
                 angle = angle,
                 score = score
             };
-
             detectedObjects.Add(obj);
         }
 
         return detectedObjects;
-    }
-
-    bool IsObstructed(Transform target)
-    {
-        Vector3 direction = (target.position - playerCamera.transform.position).normalized;
-        float distance = Vector3.Distance(playerCamera.transform.position, target.position);
-
-        if (Physics.Raycast(playerCamera.transform.position, direction, out RaycastHit hit, distance, obstructionLayer))
-        {
-            if (hit.transform != target)
-                return true;
-        }
-
-        return false;
     }
 
     bool IsTimeMatching(PhotoQuestObject.TimeRequirement requirement)

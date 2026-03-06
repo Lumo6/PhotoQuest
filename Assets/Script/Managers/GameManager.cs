@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float totalDayDuration;
     [SerializeField] private float sunsetStart;
     [SerializeField] private float nightStart;
-    [SerializeField] private int day = 0;
+    [SerializeField] private int day = 1;
 
     [Header("Quest")]
     [SerializeField] private List<PhotoQuestObject> questsSO;
@@ -48,7 +49,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private ParticleSystem FestivalParticle;
 
-    
+    [Tooltip("Clip de musique de fond du menu")]
+    [SerializeField] private AudioClip mainMusicClip; // Musique de fond du jeu
 
 
     private float currentTime;
@@ -80,11 +82,15 @@ public class GameManager : MonoBehaviour
         else
             Debug.Log("Remember to assign quests in the GameManager!");
 
-        
+        StartCoroutine(GenerateNpcWithDelay()); // Génère 30 pnj avec une intervale de 1 sec 
+    }
 
+    IEnumerator GenerateNpcWithDelay()
+    {
         for (int i = 0; i < poispawn.Count; i++)
         {
             spawnNpc();
+            yield return new WaitForSeconds(1f);
         }
     }
 
@@ -93,6 +99,15 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.ActualiazeView(quests);
         var main = FestivalParticle.main;
         main.duration = totalDayDuration;
+        Time.timeScale = 0f;
+        SoundFXManager.Instance.PlaySound(mainMusicClip, this.transform, true);
+    }
+
+    public void StartGame()
+    {
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -154,6 +169,7 @@ public class GameManager : MonoBehaviour
     {
         npcs.Remove(npc);
         Destroy(npc);
+        spawnNpc();
     }
 
     private void UpdateTimeOfDay()

@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6313d2e45aad175429e3297ae90c7596, type: 3}
-  m_Name: test3
+  m_Name: Quest4
   m_EditorClassIdentifier: Assembly-CSharp::PhotoQuestObject
-  questTitle: Oh, Shiny !
-  description: Take a photo of a bald man close to a building with some trees behind
-    him.
+  questTitle: Business man chilling
+  description: Take a photo of a business man chilling on a bench
   requiredTags:
+  - bench
   - man
-  - bald
-  - building
-  - tree
-  timeRequirement: 3
-  requiredAnimations: []
-  goodVibesPoints: 35
+  - suit
+  timeRequirement: 1
+  requiredAnimations:
+  - sitting
+  goodVibesPoints: 50
   completed: 0
